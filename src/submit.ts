@@ -8,12 +8,20 @@ export async function submitFitAudit(formData: {
     fabric: number;
     validation: number;
   };
+  weakestPillar: {
+    name: string;
+    score: number;
+  };
+  strongestPillar: {
+    name: string;
+    score: number;
+  };
   questionsAndAnswers: Array<{ question: string; answer: string; pillar: string }>;
-  lead: { email: string; whatsapp: string };
+  lead: { name: string; email: string; whatsapp: string };
 }) {
   try {
     const response = await fetch(
-      "https://bothook.io/v1/public/triggers/webhooks/341188b6-49ad-4252-9450-e94670d70a7e",
+      "https://bothook.io/v1/public/triggers/webhooks/f1c99c63-a98a-4249-b4e2-82eb1e5090ac",
       {
         method: "POST",
         headers: {

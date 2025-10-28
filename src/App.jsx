@@ -90,6 +90,21 @@ export default function App() {
         validation: pillarScores[4],
       };
 
+      // Find weakest and strongest pillars
+      const pillarNames = ["blocks", "grading", "tolerance", "fabric", "validation"];
+      const weakestIndex = pillarScores.findIndex((score) => score === Math.min(...pillarScores));
+      const strongestIndex = pillarScores.findIndex((score) => score === Math.max(...pillarScores));
+
+      const weakestPillar = {
+        name: pillarNames[weakestIndex],
+        score: pillarScores[weakestIndex],
+      };
+
+      const strongestPillar = {
+        name: pillarNames[strongestIndex],
+        score: pillarScores[strongestIndex],
+      };
+
       // Combine questions and answers
       const questionsAndAnswers = allQs.map((item, index) => ({
         question: item.q,
@@ -101,8 +116,14 @@ export default function App() {
         totalScore,
         percent,
         pillarScores: namedPillarScores,
+        weakestPillar,
+        strongestPillar,
         questionsAndAnswers,
-        lead,
+        lead: {
+          name: lead.name,
+          email: lead.email,
+          whatsapp: "+91" + lead.whatsapp,
+        },
       });
 
       if (result.success) {
@@ -178,7 +199,7 @@ export default function App() {
   const qTopRef = React.useRef(null);
   // Prevent initial auto-scroll to the questions on first load
   const stepFirstRunRef = React.useRef(true);
-  const [lead, setLead] = React.useState({ email: "", whatsapp: "" });
+  const [lead, setLead] = React.useState({ name: "", email: "", whatsapp: "" });
   // Live phone helpers
   const cleanedPhone = (lead.whatsapp || "").replace(/\D/g, "");
   const normalizedPreview = cleanedPhone.startsWith("+91")
@@ -263,6 +284,10 @@ export default function App() {
       return;
     }
 
+    if (!lead.name.trim()) {
+      setWaError("Please enter your name.");
+      return;
+    }
     if (!lead.email) {
       setWaError("Please enter your work email.");
       return;
@@ -716,6 +741,14 @@ export default function App() {
                   <div className="w-full md:w-auto grid md:grid-cols-2 gap-3">
                     {!showScore && (
                       <>
+                        <input
+                          type="text"
+                          required
+                          placeholder="Your name"
+                          value={lead.name}
+                          onChange={(e) => setLead({ ...lead, name: e.target.value })}
+                          className="rounded-xl border px-4 py-2"
+                        />
                         <input
                           type="email"
                           required
