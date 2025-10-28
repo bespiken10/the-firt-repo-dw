@@ -1,4 +1,5 @@
 import React from "react";
+import { submitFitAudit } from "./submit";
 
 export default function App() {
   //() {
@@ -80,74 +81,37 @@ export default function App() {
 
   const sendWA = async () => {
     try {
-      const formUrl =
-        "https://docs.google.com/forms/d/e/1FAIpQLSfx8sUNNTEGy-9_CpWZzvIRLzO1dYZze5T4NLDJfq2HF3-9uw/formResponse";
-      const formData = new FormData();
+      // Create named pillar scores object
+      const namedPillarScores = {
+        blocks: pillarScores[0],
+        grading: pillarScores[1],
+        tolerance: pillarScores[2],
+        fabric: pillarScores[3],
+        validation: pillarScores[4],
+      };
 
-      // Add email and phone
-      formData.append("entry.685962107", lead.email || "");
-      formData.append("entry.1503441590", normalizedPreview || "");
+      // Combine questions and answers
+      const questionsAndAnswers = allQs.map((item, index) => ({
+        question: item.q,
+        answer: answers[index] || "",
+        pillar: item.pillar,
+      }));
 
-      // Add all 25 answers
-      const answerEntries = [
-        "entry.1219235717",
-        "entry.427935214",
-        "entry.1812799490",
-        "entry.141730056",
-        "entry.389785007",
-        "entry.1867058305",
-        "entry.1834954700",
-        "entry.20708649",
-        "entry.1427538986",
-        "entry.2063128089",
-        "entry.1473586382",
-        "entry.1564183083",
-        "entry.587807405",
-        "entry.1763925510",
-        "entry.144555742",
-        "entry.2115366378",
-        "entry.1744049099",
-        "entry.55244276",
-        "entry.1104106819",
-        "entry.771064941",
-        "entry.1136303470",
-        "entry.1867613137",
-        "entry.493103173",
-        "entry.763044326",
-        "entry.766518811",
-      ];
-
-      answers.forEach((answer, idx) => {
-        if (idx < answerEntries.length) {
-          formData.append(answerEntries[idx], answer || "");
-        }
+      const result = await submitFitAudit({
+        totalScore,
+        percent,
+        pillarScores: namedPillarScores,
+        questionsAndAnswers,
+        lead,
       });
 
-      // Add pillar scores
-      const pillarEntries = [
-        "entry.1509561776", // Blocks Score
-        "entry.798851505", // Grading Score
-        "entry.1932697840", // Tolerance Score
-        "entry.1461142508", // Fabric Score
-        "entry.2080014278", // Validation Score
-      ];
-
-      pillarScores.forEach((score, idx) => {
-        if (idx < pillarEntries.length) {
-          formData.append(pillarEntries[idx], score.toString());
-        }
-      });
-
-      // Submit to Google Form
-      await fetch(formUrl, {
-        method: "POST",
-        body: formData,
-        mode: "no-cors",
-      });
-
-      // success toast
-      setShowToastHint(true);
-      return { success: true };
+      if (result.success) {
+        // success toast
+        setShowToastHint(true);
+        return { success: true };
+      } else {
+        throw new Error(result.error || "Submission failed");
+      }
     } catch (e) {
       console.warn("form submission fail", e);
       setWaError("Couldn't submit form. Please try again.");
@@ -580,8 +544,8 @@ export default function App() {
                   className="w-full rounded-2xl"
                   autoPlay
                   loop
-                  muted
                   playsInline
+                  controls
                   aria-label="Fit system demonstration video"
                 />
               </div>
@@ -613,19 +577,25 @@ export default function App() {
             {/* Animated metrics */}
             <div className="grid md:grid-cols-3 gap-6 mt-8">
               <div className="rounded-2xl border p-6 bg-white shadow-sm">
-                <div className="text-4xl font-extrabold text-gray-900">{vReturn.toFixed(0)}% → 15%</div>
+                <div className="text-4xl font-extrabold text-gray-900">
+                  25% → <span className="text-emerald-600">{vReturn.toFixed(0)}%</span>
+                </div>
                 <p className="mt-2 text-sm text-gray-600">
                   Return rate drop after 8 weeks on a 30–60 SKU menswear line (India).
                 </p>
               </div>
               <div className="rounded-2xl border p-6 bg-white shadow-sm">
-                <div className="text-4xl font-extrabold text-gray-900">{vDays.toFixed(0)}d → 2d</div>
+                <div className="text-4xl font-extrabold text-gray-900">
+                  7d → <span className="text-emerald-600">{vDays.toFixed(0)}d</span>
+                </div>
                 <p className="mt-2 text-sm text-gray-600">
                   Exchange cycle time after introducing fit‑swap + block guidance.
                 </p>
               </div>
               <div className="rounded-2xl border p-6 bg-white shadow-sm">
-                <div className="text-4xl font-extrabold text-gray-900">{vAccuracy.toFixed(0)}%+</div>
+                <div className="text-4xl font-extrabold text-gray-900">
+                  0% → <span className="text-emerald-600">{vAccuracy.toFixed(0)}%</span>
+                </div>
                 <p className="mt-2 text-sm text-gray-600">Size accuracy on block‑aligned products across sizes.</p>
               </div>
             </div>
@@ -820,7 +790,7 @@ export default function App() {
                       <div key={p.name} className="text-center">
                         <div className="h-28 bg-gray-100 rounded-xl flex items-end overflow-hidden">
                           <div
-                            className="w-full bg-gradient-to-t from-emerald-400 to-amber-300 transition-all"
+                            className="w-full bg-linear-to-t from-emerald-400 to-amber-300 transition-all"
                             style={{ height: `${showScore ? (pillarScores[i] / 5) * 100 : 8}%` }}
                           />
                         </div>
