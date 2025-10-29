@@ -197,8 +197,6 @@ export default function App() {
   const [step, setStep] = React.useState(0); // 0..4 (5 questions per step)
   const groupSize = 5;
   const qTopRef = React.useRef(null);
-  // Prevent initial auto-scroll to the questions on first load
-  const stepFirstRunRef = React.useRef(true);
   const [lead, setLead] = React.useState({ name: "", email: "", whatsapp: "" });
   // Live phone helpers
   const cleanedPhone = (lead.whatsapp || "").replace(/\D/g, "");
@@ -222,15 +220,6 @@ export default function App() {
     setTimeout(() => setAnalysisPhase(false), ms);
   }, []);
 
-  // Auto-scroll the question group into view whenever the step changes
-  React.useEffect(() => {
-    if (typeof window === "undefined") return;
-    // Skip on first render so the page stays at the hero
-    if (stepFirstRunRef.current) {
-      stepFirstRunRef.current = false;
-      return;
-    }
-  }, [step]);
   const scrollToRoadmap = () => {
     roadmapRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     // Start analysis when user explicitly opens the roadmap (only if not already started)
@@ -668,8 +657,9 @@ export default function App() {
           <div className="grid md:grid-cols-2 gap-12 items-start">
             {/* LEFT: 25-question wizard, 5-at-a-time */}
             <div>
-              <div ref={qTopRef} />
-              <h2 className="text-2xl md:text-3xl font-bold">Quick Fit Audit — 5 questions at a time</h2>
+              <h2 className="text-2xl md:text-3xl font-bold" ref={qTopRef}>
+                Quick Fit Audit — 5 questions at a time
+              </h2>
               <p className="mt-2 text-gray-600 text-sm">
                 Answer honestly. <span className="font-medium">Yes</span> = 1,{" "}
                 <span className="font-medium">Partial</span> = 0.5, <span className="font-medium">No</span> = 0.
@@ -725,7 +715,14 @@ export default function App() {
                 </button>
                 {step < 4 ? (
                   <button
-                    onClick={() => canAdvance && setStep((s) => s + 1)}
+                    onClick={() => {
+                      if (canAdvance) {
+                        setStep((s) => s + 1);
+                        setTimeout(() => {
+                          qTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }, 50);
+                      }
+                    }}
                     disabled={!canAdvance}
                     className="px-4 py-2 rounded-xl bg-black text-white disabled:opacity-50"
                   >
