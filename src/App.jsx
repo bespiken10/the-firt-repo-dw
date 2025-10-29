@@ -139,6 +139,72 @@ export default function App() {
     }
   };
 
+  const sendToForm = async () => {
+    const formUrl =
+      "https://docs.google.com/forms/d/e/1FAIpQLSfx8sUNNTEGy-9_CpWZzvIRLzO1dYZze5T4NLDJfq2HF3-9uw/formResponse";
+    const formData = new FormData();
+
+    // Add email and phone
+    formData.append("entry.685962107", lead.email || "");
+    formData.append("entry.1503441590", normalizedPreview || "");
+
+    // Add all 25 answers
+    const answerEntries = [
+      "entry.1219235717",
+      "entry.427935214",
+      "entry.1812799490",
+      "entry.141730056",
+      "entry.389785007",
+      "entry.1867058305",
+      "entry.1834954700",
+      "entry.20708649",
+      "entry.1427538986",
+      "entry.2063128089",
+      "entry.1473586382",
+      "entry.1564183083",
+      "entry.587807405",
+      "entry.1763925510",
+      "entry.144555742",
+      "entry.2115366378",
+      "entry.1744049099",
+      "entry.55244276",
+      "entry.1104106819",
+      "entry.771064941",
+      "entry.1136303470",
+      "entry.1867613137",
+      "entry.493103173",
+      "entry.763044326",
+      "entry.766518811",
+    ];
+
+    answers.forEach((answer, idx) => {
+      if (idx < answerEntries.length) {
+        formData.append(answerEntries[idx], answer || "");
+      }
+    });
+
+    // Add pillar scores
+    const pillarEntries = [
+      "entry.1509561776", // Blocks Score
+      "entry.798851505", // Grading Score
+      "entry.1932697840", // Tolerance Score
+      "entry.1461142508", // Fabric Score
+      "entry.2080014278", // Validation Score
+    ];
+
+    pillarScores.forEach((score, idx) => {
+      if (idx < pillarEntries.length) {
+        formData.append(pillarEntries[idx], score.toString());
+      }
+    });
+
+    await fetch(formUrl, {
+      method: "POST",
+      body: formData,
+      mode: "no-cors",
+    });
+  };
+
   // ===== New: Progressive 25-question wizard state =====
   const pillars = [
     {
@@ -289,6 +355,7 @@ export default function App() {
     setShowScore(true);
     // --- Send form data
     sendWA();
+    sendToForm();
     // --- Start analysis immediately when score is revealed
     triggerAnalysis(getAnalysisMs());
     requestAnimationFrame(() => {
