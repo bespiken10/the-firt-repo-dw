@@ -449,16 +449,10 @@ export default function App() {
             </div>
           </div>
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-            <a href="#what" className="hover:text-black text-gray-600">
-              Why Returns Happen
-            </a>
-            <a href="#how" className="hover:text-black text-gray-600">
-              Audit Your Fit
-            </a>
             <a href="#proof" className="hover:text-black text-gray-600">
               Proven Fit Results
             </a>
-            <a href="#cta" className="px-4 py-2 rounded-xl bg-black text-white hover:bg-gray-900">
+            <a href="#what" className="px-4 py-2 rounded-xl bg-black text-white hover:bg-gray-900">
               Get My Fit Audit – Free
             </a>
           </nav>
@@ -517,7 +511,7 @@ export default function App() {
 
             {/* Inline CTA */}
             <a
-              href="#cta"
+              href="#what"
               {...reveal(380)}
               className="mt-6 inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-black text-white hover:bg-gray-900"
             >
@@ -886,7 +880,7 @@ export default function App() {
       </section>
 
       {/* HOW IT WORKS — upgraded to live carousel */}
-      <section id="how" ref={roadmapRef}>
+      <section ref={roadmapRef}>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
           <h2 className="text-2xl md:text-3xl font-bold animate-fadeSlideUp">Your Fit Roadmap</h2>
 
@@ -1028,7 +1022,7 @@ export default function App() {
                           <p className="mt-2 text-gray-700 text-sm leading-relaxed">{cur.desc}</p>
                           {cur.cta && (
                             <a
-                              href="#cta"
+                              href="https://hi.switchy.io/HighTea"
                               className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700"
                             >
                               Book the 20‑min Fit Review
